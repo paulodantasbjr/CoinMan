@@ -2,6 +2,7 @@ package com.paulodantas.coinman;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -12,41 +13,44 @@ import com.badlogic.gdx.math.Rectangle;
 import java.util.ArrayList;
 import java.util.Random;
 
+
 public class CoinMan extends ApplicationAdapter {
     private SpriteBatch batch;
 
     private Texture background;
     private Texture[] man;
-    private Texture bomba;
-    private Texture moeda;
-    private Texture tonto;
+    private Texture bomb;
+    private Texture coin;
+    private Texture dizzy;
     private Texture gameOver;
 
-    private BitmapFont pontuacao;
-    private BitmapFont textoReiniciar;
-    private BitmapFont textoMelhorPontuacao;
+    private BitmapFont score;
+    private BitmapFont restartText;
+    private BitmapFont bestScoreText;
 
 
     private int manState = 0;
     private int pause = 0;
-    private float velocidade = 0;
+    private float velocity = 0;
     private int manY = 0;
-    private int pontos = 0;
+    private int scores = 0;
     private int gameState = 0;
+    private Preferences preferences;
+    private int maxScore = 0;
 
     private Random random;
 
-    private ArrayList<Integer> moedaX = new ArrayList<Integer>();
-    private ArrayList<Integer> moedaY = new ArrayList<Integer>();
-    private ArrayList<Rectangle> retanguloMoeda = new ArrayList<Rectangle>();
+    private ArrayList<Integer> coinX = new ArrayList<Integer>();
+    private ArrayList<Integer> coinY = new ArrayList<Integer>();
+    private ArrayList<Rectangle> rectangleCoin = new ArrayList<Rectangle>();
 
-    private int contadorMoeda;
+    private int coinCounter;
 
-    private ArrayList<Integer> bombaX = new ArrayList<Integer>();
-    private ArrayList<Integer> bombaY = new ArrayList<Integer>();
-    private ArrayList<Rectangle> retanguloBomba = new ArrayList<Rectangle>();
+    private ArrayList<Integer> bombX = new ArrayList<Integer>();
+    private ArrayList<Integer> bombY = new ArrayList<Integer>();
+    private ArrayList<Rectangle> rectangleBomb = new ArrayList<Rectangle>();
 
-    private int contadorBomba;
+    private int bombCounter;
 
     @Override
     public void create() {
@@ -58,40 +62,43 @@ public class CoinMan extends ApplicationAdapter {
         man[2] = new Texture("frame-3.png");
         man[3] = new Texture("frame-4.png");
 
-        textoReiniciar = new BitmapFont();
-        textoReiniciar.setColor(Color.WHITE);
-        textoReiniciar.getData().setScale(3);
+        restartText = new BitmapFont();
+        restartText.setColor(Color.WHITE);
+        restartText.getData().setScale(3);
 
-        textoMelhorPontuacao = new BitmapFont();
-        textoMelhorPontuacao.setColor(Color.WHITE);
-        textoMelhorPontuacao.getData().setScale(3);
+        bestScoreText = new BitmapFont();
+        bestScoreText.setColor(Color.WHITE);
+        bestScoreText.getData().setScale(3);
 
 
         manY = Gdx.graphics.getHeight() / 2;
 
-        moeda = new Texture("coin.png");
-        bomba = new Texture("bomb.png");
+        preferences = Gdx.app.getPreferences("CoinMan");
+        maxScore = preferences.getInteger("maxScore", 0);
+
+        coin = new Texture("coin.png");
+        bomb = new Texture("bomb.png");
         random = new Random();
 
-        tonto = new Texture("dizzy-1.png");
+        dizzy = new Texture("dizzy-1.png");
 
         gameOver = new Texture("game_over.png");
 
-        pontuacao = new BitmapFont();
-        pontuacao.setColor(Color.WHITE);
-        pontuacao.getData().setScale(10);
+        score = new BitmapFont();
+        score.setColor(Color.WHITE);
+        score.getData().setScale(10);
     }
 
     private void criarMoeda() {
         float height = random.nextFloat() * Gdx.graphics.getHeight();
-        moedaY.add((int) height);
-        moedaX.add(Gdx.graphics.getWidth());
+        coinY.add((int) height);
+        coinX.add(Gdx.graphics.getWidth());
     }
 
     private void criarBomba() {
         float height = random.nextFloat() * Gdx.graphics.getHeight();
-        bombaY.add((int) height);
-        bombaX.add(Gdx.graphics.getWidth());
+        bombY.add((int) height);
+        bombX.add(Gdx.graphics.getWidth());
     }
 
     @Override
@@ -104,37 +111,37 @@ public class CoinMan extends ApplicationAdapter {
         if (gameState == 1) {
             // Game Iniciado
             // Bomba
-            if (contadorBomba < 250) {
-                contadorBomba++;
+            if (bombCounter < 250) {
+                bombCounter++;
             } else {
-                contadorBomba = 0;
+                bombCounter = 0;
                 criarBomba();
             }
 
-            retanguloBomba.clear();
-            for (int i = 0; i < bombaX.size(); i++) {
-                batch.draw(bomba, bombaX.get(i), bombaY.get(i));
-                bombaX.set(i, bombaX.get(i) - 8);
-                retanguloBomba.add(new Rectangle(bombaX.get(i), bombaY.get(i), bomba.getWidth(), bomba.getHeight()));
+            rectangleBomb.clear();
+            for (int i = 0; i < bombX.size(); i++) {
+                batch.draw(bomb, bombX.get(i), bombY.get(i));
+                bombX.set(i, bombX.get(i) - 8);
+                rectangleBomb.add(new Rectangle(bombX.get(i), bombY.get(i), bomb.getWidth(), bomb.getHeight()));
             }
 
             // Moeda
-            if (contadorMoeda < 100) {
-                contadorMoeda++;
+            if (coinCounter < 100) {
+                coinCounter++;
             } else {
-                contadorMoeda = 0;
+                coinCounter = 0;
                 criarMoeda();
             }
 
-            retanguloMoeda.clear();
-            for (int i = 0; i < moedaX.size(); i++) {
-                batch.draw(moeda, moedaX.get(i), moedaY.get(i));
-                moedaX.set(i, moedaX.get(i) - 4);
-                retanguloMoeda.add(new Rectangle(moedaX.get(i), moedaY.get(i), moeda.getWidth(), moeda.getHeight()));
+            rectangleCoin.clear();
+            for (int i = 0; i < coinX.size(); i++) {
+                batch.draw(coin, coinX.get(i), coinY.get(i));
+                coinX.set(i, coinX.get(i) - 4);
+                rectangleCoin.add(new Rectangle(coinX.get(i), coinY.get(i), coin.getWidth(), coin.getHeight()));
             }
 
             if (ToqueTela) {
-                velocidade = -10;
+                velocity = -10;
             }
 
             if (pause < 10) {
@@ -149,8 +156,8 @@ public class CoinMan extends ApplicationAdapter {
             }
 
             float gravity = 0.5f;
-            velocidade += gravity;
-            manY -= velocidade;
+            velocity += gravity;
+            manY -= velocity;
 
             if (manY <= 0) {
                 manY = 0;
@@ -165,48 +172,53 @@ public class CoinMan extends ApplicationAdapter {
             if (ToqueTela) {
                 gameState = 1;
                 manY = Gdx.graphics.getHeight() / 2;
-                pontos = 0;
-                velocidade = 0;
-                moedaX.clear();
-                moedaY.clear();
-                retanguloMoeda.clear();
-                contadorMoeda = 0;
-                bombaX.clear();
-                bombaY.clear();
-                retanguloBomba.clear();
-                contadorBomba = 0;
+                scores = 0;
+                velocity = 0;
+                coinX.clear();
+                coinY.clear();
+                rectangleCoin.clear();
+                coinCounter = 0;
+                bombX.clear();
+                bombY.clear();
+                rectangleBomb.clear();
+                bombCounter = 0;
             }
-        }
-
-        if (gameState == 2) {
-            batch.draw(tonto, Gdx.graphics.getWidth() / 2f - man[manState].getWidth() / 2f, manY);
-            batch.draw(gameOver, Gdx.graphics.getWidth() / 2f - gameOver.getWidth()/2f,Gdx.graphics.getHeight() / 2f);
-            textoReiniciar.draw(batch,"Toque para reiniciar!",Gdx.graphics.getWidth() / 2f - 200,Gdx.graphics.getHeight() / 2f);
-            int pontuacaoMaxima = 0;
-            textoMelhorPontuacao.draw(batch, "Seu record é: "+ pontuacaoMaxima +" pontos", Gdx.graphics.getWidth() / 2f - 200 ,Gdx.graphics.getHeight() / 2f - gameOver.getHeight());
-
-        } else {
-            batch.draw(man[manState], Gdx.graphics.getWidth() / 2f - man[manState].getWidth() / 2f, manY);
         }
         Rectangle manRectangle = new Rectangle(Gdx.graphics.getWidth() / 2f - man[manState].getWidth() / 2f, manY, man[manState].getWidth(), man[manState].getHeight());
 
-        for (int i = 0; i < retanguloMoeda.size(); i++) {
-            if (Intersector.overlaps(manRectangle, retanguloMoeda.get(i))) {
-                pontos++;
-                retanguloMoeda.remove(i);
-                moedaX.remove(i);
-                moedaY.remove(i);
-                break;
-            }
-        }
-
-        for (int i = 0; i < retanguloBomba.size(); i++) {
-            if (Intersector.overlaps(manRectangle, retanguloBomba.get(i))) {
+        for (int i = 0; i < rectangleBomb.size(); i++) {
+            if (Intersector.overlaps(manRectangle, rectangleBomb.get(i))) {
                 gameState = 2;
             }
         }
 
-        pontuacao.draw(batch, String.valueOf(pontos), 100, 200);
+        if (gameState == 2) {
+            batch.draw(dizzy, Gdx.graphics.getWidth() / 2f - man[manState].getWidth() / 2f, manY);
+            batch.draw(gameOver, Gdx.graphics.getWidth() / 2f - gameOver.getWidth()/2f,Gdx.graphics.getHeight() / 2f);
+            restartText.draw(batch,"Toque para reiniciar!",Gdx.graphics.getWidth() / 2f - 200,Gdx.graphics.getHeight() / 2f);
+            bestScoreText.draw(batch, "Seu record é: "+ maxScore +" pontos", Gdx.graphics.getWidth() / 2f - 200 ,Gdx.graphics.getHeight() / 2f - gameOver.getHeight());
+
+            if (scores > maxScore) {
+                maxScore = scores;
+                preferences.putInteger("maxScore", maxScore);
+                preferences.flush();
+            }
+
+        } else {
+            batch.draw(man[manState], Gdx.graphics.getWidth() / 2f - man[manState].getWidth() / 2f, manY);
+        }
+
+        for (int i = 0; i < rectangleCoin.size(); i++) {
+            if (Intersector.overlaps(manRectangle, rectangleCoin.get(i))) {
+                scores++;
+                rectangleCoin.remove(i);
+                coinX.remove(i);
+                coinY.remove(i);
+                break;
+            }
+        }
+
+        score.draw(batch, String.valueOf(scores), 100, 200);
 
         batch.end();
 
