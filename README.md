@@ -12,14 +12,15 @@ What things you need to install the software and how to install them
  
  -[JDK](https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html) - Version 8+
  
+ # Libraries
+  -[LIBGdx](https://libgdx.badlogicgames.com/download.html) - For game development
+ 
  # ScreenShots
  ![Home Screen](https://github.com/Jrw0w/CoinMan/blob/master/image/inicio.png) 
  ![Game On](https://github.com/Jrw0w/CoinMan/blob/master/image/meio1.png)
  ![Game On](https://github.com/Jrw0w/CoinMan/blob/master/image/meio2.png)
  ![Game Over](https://github.com/Jrw0w/CoinMan/blob/master/image/fim.png)
  
- # Libraries
-  -[LIBGdx](https://libgdx.badlogicgames.com/download.html) - For game development
   
  # Contributing
 Please read [CONTRIBUTING.md](https://github.com/Jrw0w/CoinMan/blob/master/CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
